@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>
+			{% block title %}Restaurant
+			{% endblock %}
+		</title>
+		<!-- Add your CSS styles here -->
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+			}
+
+			.fils {
+				padding-left: 300px;
+			}
+
+			.page-wrapper {
+				margin-top: 5px;
+			}
+
+			.container-fluid {
+				padding: 0;
+			}
+
+			.card {
+				padding: 3px;
+			}
+
+			.text-info {
+				color: #17a2b8 !important;
+			}
+
+			.text-gray-800 {
+				color: #343a40 !important;
+			}
+
+			.btn-success {
+				background-color: #28a745;
+				color: #fff;
+				border: none;
+			}
+
+			.btn-warning {
+				background-color: #ffc107;
+				color: #343a40;
+				border: none;
+			}
+
+			.my-2 {
+				margin-top: 2px;
+				margin-bottom: 2px;
+			}
+
+			.table th,
+			.table td {
+				border: 1px solid #dee2e6;
+				padding: 8px;
+				text-align: left;
+			}
+		</style>
+	</head>
+
+	<body>
+		{% extends 'base.html.twig' %}
+
+		{% block body %}
+			<div class="fils">
+				<h1>Restaurant show</h1>
+				<div class="page-wrapper my-5">
+					<div class="container-fluid" id="container-wrapper">
+						<div class="card p-3">
+							<div class="row">
+								<a class="col-1 text-info" href="{{ path('app_restaurant_index') }}">back</a>
+								<h5 class="col-8 text-gray-800 pl-3">
+									Restaurant
+								</h5>
+								<a class="col-2 btn btn-success " href="{{ path('app_restaurant_show', {'id_restau': restaurant.idRestau})}}">
+									Exporter pdf
+								</a>
+							</div>
+						</div>
+						<div class="row ">
+							<div class="col-lg-12">
+								<div class="card p-3">
+									<table class="table">
+										<tbody>
+											<tr>
+												<th>IdRestau</th>
+												<td>{{ restaurant.idRestau }}</td>
+											</tr>
+											<tr>
+												<th>Nom</th>
+												<td>{{ restaurant.nom }}</td>
+											</tr>
+											<tr>
+												<th>Location</th>
+												<td>{{ restaurant.location }}</td>
+											</tr>
+										</tbody>
+									</table>
+
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		{% endblock %}
+	</body>
+
+</html>
