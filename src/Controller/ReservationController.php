@@ -36,24 +36,24 @@ class ReservationController extends AbstractController
         $form = $this->createForm(ReservationType::class, $reservation);
         $form->handleRequest($request);
 
-        
-        $sid='AC2eb2c8a866ca28cc41a4c86e365022d4';
-        $token='96b0570df3d033cc32cdd6b1f9456489';
-        $from = '+17067527070';
-        $twilio = new Client($sid, $token); 
-  
-       $message = $twilio->messages 
-         ->create("+21621866975", // to 
-         array(  
-            "messagingServiceSid" => "MG125b643196d13136ccbfb9fe83ebe86d",      
-            "body" => "Votre réservation a été ajoutée" 
-         ) 
-        ); 
+       
+
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($reservation);
             $entityManager->flush();
-       
+            /*****SMS  */
+            $sid    = "ACf5ec706ace08f438fd86654780ef826f";
+            $token  = "7a3a9bc2e3e638820c973810fba7cd04";
+            $twilio = new Client($sid, $token);
+            
+            $message = $twilio->messages
+              ->create("+21692548524", // to
+                array(
+                  "from" => "+14703750613",
+                  "body" => "Votre réservation a été ajoutée" 
+                )
+              );
 
           return $this->redirectToRoute('app_reservation_index', [], Response::HTTP_SEE_OTHER);
         }
