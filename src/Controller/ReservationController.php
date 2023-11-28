@@ -10,6 +10,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use App\Repository\UserRepository;
+use Twilio\Rest\Client;
+use Symfony\Component\Notifier\TexterInterface;
 
 #[Route('/reservation')]
 class ReservationController extends AbstractController
@@ -23,17 +30,32 @@ class ReservationController extends AbstractController
     }
 
     #[Route('/new', name: 'app_reservation_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager ,MailerInterface $mailer, CsrfTokenManagerInterface $csrfTokenManager, UserRepository $userRepository): Response
     {
         $reservation = new Reservation();
         $form = $this->createForm(ReservationType::class, $reservation);
         $form->handleRequest($request);
 
+        
+        $sid='AC2eb2c8a866ca28cc41a4c86e365022d4';
+        $token='96b0570df3d033cc32cdd6b1f9456489';
+        $from = '+17067527070';
+        $twilio = new Client($sid, $token); 
+  
+       $message = $twilio->messages 
+         ->create("+21621866975", // to 
+         array(  
+            "messagingServiceSid" => "MG125b643196d13136ccbfb9fe83ebe86d",      
+            "body" => "Votre réservation a été ajoutée" 
+         ) 
+        ); 
+
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($reservation);
             $entityManager->flush();
+       
 
-            return $this->redirectToRoute('app_reservation_index', [], Response::HTTP_SEE_OTHER);
+          return $this->redirectToRoute('app_reservation_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->renderForm('reservation/new.html.twig', [
@@ -41,6 +63,7 @@ class ReservationController extends AbstractController
             'form' => $form,
         ]);
     }
+   
 
     #[Route('/{idRes}', name: 'app_reservation_show', methods: ['GET'])]
     public function show(Reservation $reservation): Response

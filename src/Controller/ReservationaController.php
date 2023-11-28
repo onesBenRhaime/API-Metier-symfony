@@ -12,10 +12,23 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use CMEN\GoogleChartsBundle\GoogleCharts\Charts\BarChart;
+use CMEN\GoogleChartsBundle\GoogleCharts\Charts\PieChart;
 
 #[Route('/reservationa')]
 class ReservationaController extends AbstractController
 {
+    #[Route('/reservation-stat', name: 'reservation_stat')]
+    public function reservationsStatistics(ReservationRepository $reservationRepository): Response
+    {
+        $statsData = $reservationRepository->getReservationsCountByDay();
+
+        // Passer les données à la vue
+        return $this->render('reservationa/reservation_stat.html.twig', [
+            'statsData' => $statsData,
+        ]);
+    }
+ 
     #[Route('/', name: 'app_reservationa_index', methods: ['GET'])]
     public function index(ReservationRepository $reservationRepository): Response
     {
@@ -57,4 +70,7 @@ class ReservationaController extends AbstractController
 
         return $this->redirectToRoute('app_reservationa_index', [], Response::HTTP_SEE_OTHER);
     }
+
+    
+ 
 }

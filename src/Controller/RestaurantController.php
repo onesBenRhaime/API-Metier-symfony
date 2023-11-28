@@ -11,11 +11,41 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-
+use Dompdf\Dompdf;
 #[Route('/restaurant')]
 class RestaurantController extends AbstractController
 {
+   
+    #[Route('/exporter', name: 'app_restaurants_pdf', methods: ['GET'])]
+    public function generatePdf()
+    {
+        // Fetch all restaurants from the database
+        $data = $this->getDoctrine()->getRepository(Restaurant::class)->findAll();
+
+        // Render the HTML template with the fetched data
+        $html = $this->renderView('restaurant/pdf.html.twig', [
+            'restaurants' => $data
+        ]);
+
+        // Create a Dompdf instance
+        $dompdf = new Dompdf();
+        
+        // Load the HTML content into Dompdf
+        $dompdf->loadHtml($html);
+
+        // Render the PDF
+        $dompdf->render();
+
+        // Output the PDF
+        $pdfOutput = $dompdf->output();
+
+        // Return the PDF as a Symfony Response
+        return new Response($pdfOutput, 200, [
+            'Content-Type' => 'application/pdf'
+        ]);
+    }
     
+
 #[Route('/search', name: 'ajax_search', methods: ['GET'])]
 public function searchAction(Request $request, RestaurantRepository $charityDemandRepository): Response
 {
@@ -96,15 +126,26 @@ public function getRealEntities($charitydemands)
             'restaurant' => $restaurant,
         ]);
     }
-   
-    #[Route('/{id_restau}', name: 'app_restaurant_pdf', methods: ['GET'])]
+  
+  
+    #[Route('/pdf/{id_restau}', name: 'app_restaurant_pdf', methods: ['GET'])]
     public function pdf(Restaurant $restaurant): Response { 
-     
-        return $this->render('restaurant/pdf.html.twig', [
-            'restaurant' => $restaurant,
+        $html = $this->renderView('restaurant/restaurantPDF.html.twig', [
+            'restaurant' => $restaurant
+        ]);
+
+      
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml($html);
+        $dompdf->render();
+    
+        $pdfOutput = $dompdf->output();
+    
+        return new Response($pdfOutput, 200, [
+            'Content-Type' => 'application/pdf'
         ]);
     }
-
+    
     #[Route('/{id_restau}/edit', name: 'app_restaurant_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Restaurant $restaurant, EntityManagerInterface $entityManager): Response
     {
